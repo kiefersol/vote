@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>투표 상세</title>
+  <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-md">
+    <h1 id="voteTitle" class="text-2xl font-bold text-gray-800 mb-2">투표 제목</h1>
+    <p id="voteDescription" class="text-gray-600 mb-6">투표 설명</p>
+
+    <canvas id="voteChart" class="max-w-md mx-auto my-8"></canvas>
+    <div id="voteOptions" class="mt-6 text-center"></div>
+  </div>
+
+  <!-- ✅ 커스텀 모달 -->
+  <div id="confirmModal" class="fixed inset-0 flex items-center justify-center bg-black/50 hidden z-50">
+    <div class="bg-white p-6 rounded shadow max-w-sm w-full text-center">
+      <p id="modalText" class="text-lg font-medium mb-4 text-gray-800">확인 메시지</p>
+      <button id="confirmYes" class="px-4 py-2 bg-blue-500 text-white rounded mr-2">예</button>
+      <button id="confirmNo" class="px-4 py-2 bg-gray-300 text-black rounded">아니오</button>
+    </div>
+  </div>
+
+  <div id="toastMessage" class="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-2 rounded shadow-lg hidden z-50">
+    투표가 완료되었습니다.
+  </div>
+
+  <script>
+    function showConfirm(text, onConfirm) {
+      document.getElementById('modalText').textContent = text;
+      const modal = document.getElementById('confirmModal');
+      modal.classList.remove('hidden');
+
+      const yes = document.getElementById('confirmYes');
+      const no = document.getElementById('confirmNo');
+
+      const close = () => modal.classList.add('hidden');
+
+      yes.onclick = () => { close(); onConfirm(); };
+      no.onclick = close;
+    }
+
+    function showToast(message, duration = 2000) {
+      const toast = document.getElementById('toastMessage');
+      toast.textContent = message;
+      toast.classList.remove('hidden');
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, duration);
+    }
+  </script>
+
+  <script src="../js/detail.js"></script>
+</body>
+</html>

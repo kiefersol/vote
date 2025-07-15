@@ -1,0 +1,96 @@
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+         https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <servlet>
+        <servlet-name>HealthCheck</servlet-name>
+        <servlet-class>com.example.vote.HealthCheck</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>HealthCheck</servlet-name>
+        <url-pattern>/health</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DBTestServlet</servlet-name>
+        <servlet-class>com.example.vote.DBTestServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DBTestServlet</servlet-name>
+        <url-pattern>/dbtest</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VoteListServlet</servlet-name>
+        <servlet-class>com.example.vote.VoteListServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VoteListServlet</servlet-name>
+        <url-pattern>/list</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VoteDetailServlet</servlet-name>
+        <servlet-class>com.example.vote.VoteDetailServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VoteDetailServlet</servlet-name>
+        <url-pattern>/detail</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VoteOptionServlet</servlet-name>
+        <servlet-class>com.example.vote.VoteOptionServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VoteOptionServlet</servlet-name>
+        <url-pattern>/options</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VoteSubmitServlet</servlet-name>
+        <servlet-class>com.example.vote.VoteSubmitServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VoteSubmitServlet</servlet-name>
+        <url-pattern>/submit</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VoteResultServlet</servlet-name>
+        <servlet-class>com.example.vote.VoteResultServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VoteResultServlet</servlet-name>
+        <url-pattern>/result</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VoteFinalizeServlet</servlet-name>
+        <servlet-class>com.example.vote.VoteFinalizeServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VoteFinalizeServlet</servlet-name>
+        <url-pattern>/finalize</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>VoteFinalResultServlet</servlet-name>
+        <servlet-class>com.example.vote.VoteFinalResultServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>VoteFinalResultServlet</servlet-name>
+        <url-pattern>/final_result</url-pattern>
+    </servlet-mapping>
+</web-app>
