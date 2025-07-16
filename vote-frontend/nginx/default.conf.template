@@ -1,0 +1,21 @@
+
+server {
+    listen 80;
+
+    location / {
+      root /usr/share/nginx/html;
+      index html/index.html;
+    }
+
+    # 외부 헬스체크 용도
+    location /health {
+      access_log off;
+      return 200 'OK';
+      add_header Content-Type text/plain;
+    }
+
+    location /vote/ {
+        proxy_pass http://${TOMCAT_HOST}:${TOMCAT_PORT};
+        proxy_set_header Host $host;
+    }
+}
