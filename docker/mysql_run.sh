@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 docker run -d \
   --name mysql \
   -e MYSQL_ROOT_PASSWORD=sol \
