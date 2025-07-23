@@ -1,0 +1,144 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: init-sql-configmap
+  namespace: vote  
+data:
+  init.sql: |
+    USE vote;
+    SET NAMES 'utf8mb4';
+    SET CHARACTER SET utf8mb4;
+    SET COLLATION_CONNECTION = 'utf8mb4_unicode_ci';
+
+    DROP TABLE IF EXISTS vote_result;
+    DROP TABLE IF EXISTS vote_record;
+    DROP TABLE IF EXISTS vote_option;
+    DROP TABLE IF EXISTS vote;
+    
+    CREATE TABLE vote (
+        vote_id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+        start_time DATETIME NOT NULL,
+        end_time DATETIME NOT NULL
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+    CREATE TABLE vote_option (
+        option_id INT AUTO_INCREMENT PRIMARY KEY,
+        vote_id INT NOT NULL,
+        option_text VARCHAR(255) NOT NULL,
+        FOREIGN KEY (vote_id) REFERENCES vote(vote_id) ON DELETE CASCADE
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+    CREATE TABLE vote_record (
+        record_id INT AUTO_INCREMENT PRIMARY KEY,
+        vote_id INT NOT NULL,
+        option_id INT NOT NULL,
+        voted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (vote_id) REFERENCES vote(vote_id) ON DELETE CASCADE,
+        FOREIGN KEY (option_id) REFERENCES vote_option(option_id) ON DELETE CASCADE
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+    CREATE TABLE vote_result (
+        vote_id INT NOT NULL,
+        option_id INT NOT NULL,
+        redis_count INT NOT NULL DEFAULT 0,
+        db_count INT NOT NULL DEFAULT 0,
+        is_matched BOOLEAN NOT NULL DEFAULT TRUE,
+        PRIMARY KEY (vote_id, option_id),
+        FOREIGN KEY (vote_id) REFERENCES vote(vote_id) ON DELETE CASCADE,
+        FOREIGN KEY (option_id) REFERENCES vote_option(option_id) ON DELETE CASCADE
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+    INSERT INTO vote (title, description, start_time, end_time)
+    VALUES (
+        '당신이 선호하는 음식 스타일은 무엇인가요?',
+        '좋아하는 음식 종류를 골라주세요.',
+        NOW(),
+        DATE_ADD(NOW(), INTERVAL 7 DAY)
+    );
+
+    INSERT INTO vote_option (vote_id, option_text)
+    VALUES
+    (1, '한식'),
+    (1, '중식'),
+    (1, '일식'),
+    (1, '양식'),
+    (1, '동남아식'),
+    (1, '기타');
+
+    INSERT INTO vote (title, description, start_time, end_time)
+    VALUES (
+        '당신이 선호하는 색은 무엇인가요?',
+        '좋아하는 색을 골라주세요.',
+        NOW(),
+        DATE_ADD(NOW(), INTERVAL 7 DAY)
+    );
+
+    INSERT INTO vote_option (vote_id, option_text)
+    VALUES
+    (2, '빨강'),
+    (2, '노랑'),
+    (2, '파랑'),
+    (2, '검정'),
+    (2, '흰색'),
+    (2, '기타');
+
+
+    INSERT INTO vote (title, description, start_time, end_time)
+    VALUES (
+        '당신이 선호하는 애완동물은 무엇인가요?',
+        '키우고 싶은 애완 동물의 종류를 골라주세요.',
+        NOW(),
+        DATE_ADD(NOW(), INTERVAL 7 DAY)
+    );
+
+    INSERT INTO vote_option (vote_id, option_text)
+    VALUES
+    (3, '개'),
+    (3, '고양이'),
+    (3, '토끼'),
+    (3, '햄스터'),
+    (3, '파충류'),
+    (3, '기타');
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-vote-db
+  namespace: vote  # 사용할 네임스페이스 지정
+spec:
+  template:
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:8.0  # MySQL 컨테이너 이미지
+        env:
+        - name: MYSQL_HOST
+          value: "mysql-service"  # MySQL root 비밀번호
+        - name: MYSQL_PORT
+          value: "3306"  # MySQL 서비스 이름 (예: mysql-service)
+        - name: MYSQL_USER
+          value: "hansol"  # MySQL root 비밀번호
+        - name: MYSQL_PASSWORD
+          value: "thfsol4412!"  # MySQL 서비스 이름 (예: mysql-service)
+        - name: MYSQL_ROOT_PASSWORD
+          value: "rootpassword"  # MySQL root 비밀번호
+        command:
+        - "sh"
+        - "-c"
+        - |
+          mysql -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER -p$MYSQL_PASSWORD < /scripts/init.sql
+        volumeMounts:
+        - name: init-scripts
+          mountPath: /scripts  # SQL 파일을 컨테이너에서 읽을 경로
+      restartPolicy: OnFailure  # 실패할 경우 다시 실행
+      volumes:
+      - name: init-scripts
+        configMap:
+          name: init-sql-configmap  # SQL 스크립트를 포함하는 ConfigMap
+  backoffLimit: 3  # 실패 시 재시도 횟수
+

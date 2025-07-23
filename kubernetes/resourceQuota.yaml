@@ -1,0 +1,15 @@
+# ResourceQuota : 네임스페이스 전체에서 사용할 수 있는 리소스의 "총합"을 제한
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: vote-resourcequota
+  namespace: vote
+spec:
+  # CPU Limit 초과 시 속도가 느려지기만 하고, 죽진 않음
+  # 메모리 Limit 초과 시 OOMKilled => 바로 죽음. Pod 재시작됨
+  hard:
+    pods: "10" # Pod는 최대 10개까지 생성 가능
+    requests.cpu: "1500m" # 전체 컨테이너들이 요청할 수 있는 CPU는 최대 1.5코어까지.
+    requests.memory: "4Gi" # 전체 요청 메모리는 최대 4Gi까지.
+    limits.cpu: "2000m" # 전체 제한 CPU는 최대 2코어까지.
+    limits.memory: "7Gi" # 전체 제한 메모리는 최대 7Gi까지.

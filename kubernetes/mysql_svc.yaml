@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: vote
+spec:
+  type: ExternalName
+  externalName: db-36d8mv.vpc-cdb.ntruss.com  # 외부 MySQL 도메인 주소
+  ports:
+    - port: 3306
+      targetPort: 3306  # MySQL 기본 포트

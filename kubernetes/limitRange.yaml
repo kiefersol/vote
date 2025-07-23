@@ -1,0 +1,25 @@
+# LimitRange : 개별 컨테이너 또는 Pod 단위로 "기본값"과 "최대값"을 지정
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: vote-limitrange
+  namespace: vote
+spec:
+  limits:
+  - type: Container
+    # 사용자가 limits를 안 썼을 때 자동 적용되는 limit 값
+    default:
+      cpu: 500m
+      memory: 512Mi
+    # 사용자가 requests를 안 썼을 때 자동 적용되는 request 값
+    defaultRequest:
+      cpu: 250m
+      memory: 256Mi
+    # 사용자가 설정할 수 있는 최대 limit 값
+    max:
+      cpu: 1000m
+      memory: 1Gi
+    # 사용자가 설정할 수 있는 최소 request 값
+    min:
+      cpu: 100m
+      memory: 128Mi

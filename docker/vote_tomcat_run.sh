@@ -8,4 +8,4 @@ docker run -d \
   -e REDIS_HOST=211.188.58.156 \
   -e REDIS_PORT=6379 \
   -e REDIS_PASSWORD=sol \
-  tomcat-vote:1.0
+  hansol-container-registry.kr.ncr.ntruss.com/tomcat-vote:1.0

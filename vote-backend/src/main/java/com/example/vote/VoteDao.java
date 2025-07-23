@@ -296,7 +296,9 @@ public class VoteDao {
             // 3. 결과 구성
             Set<String> optionIds = jedis.hkeys(hashKey);
             for (String optionId : optionIds) {
-                String optionText = jedis.hget(hashKey, optionId);
+
+                byte[] optionTextBytes = jedis.hget(hashKey.getBytes(StandardCharsets.UTF_8), optionId.getBytes(StandardCharsets.UTF_8));
+                String optionText = new String(optionTextBytes, StandardCharsets.UTF_8);  // UTF-8로 디코딩
                 double score = jedis.zscore(zsetKey, optionId) != null ? jedis.zscore(zsetKey, optionId) : 0;
 
                 Map<String, Object> row = new HashMap<>();
@@ -382,9 +384,13 @@ public class VoteDao {
             // 1. Redis 결과 불러오기
             Map<String, Integer> redisMap = new HashMap<>();
             List<Tuple> zset = jedis.zrangeWithScores(zsetKey, 0, -1);
+            
             for (Tuple t : zset) {
-                redisMap.put(t.getElement(), (int) t.getScore());
+                // Redis에서 가져온 값은 바이트 배열일 수 있으므로, UTF-8로 디코딩
+                String optionId = new String(t.getElement().getBytes(), StandardCharsets.UTF_8);  // UTF-8로 디코딩
+                redisMap.put(optionId, (int) t.getScore());
             }
+
 
             // 2. DB 결과 불러오기
             Map<String, Integer> dbMap = new HashMap<>();

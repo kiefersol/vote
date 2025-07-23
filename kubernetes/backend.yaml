@@ -1,0 +1,56 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vote-tomcat-config
+  namespace: vote
+data:
+  DB_URL: "jdbc:mysql://mysql-service:3306/vote?useSSL=true"  # MySQL 서비스의 ExternalName 서비스 이름
+  DB_USER: "hansol"
+  DB_PASS: "thfsol4412!"
+  REDIS_HOST: "redis-service"  # Redis 서비스 이름
+  REDIS_PORT: "6379"
+  REDIS_PASSWORD: "sol"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vote-tomcat
+  namespace: vote
+spec:
+  replicas: 1  # 필요한 복제본 수 설정
+  selector:
+    matchLabels:
+      app: vote-tomcat
+  template:
+    metadata:
+      labels:
+        app: vote-tomcat
+    spec:
+      containers:
+      - name: vote-tomcat
+        image: hansol-container-registry.kr.ncr.ntruss.com/tomcat-vote:1.0  # NCP 프라이빗 레지스트리에서 이미지를 가져옴
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: vote-tomcat-config  # ConfigMap 이름을 지정
+      imagePullSecrets:
+      - name: ncloud-registry-secret  # NCP 프라이빗 레지스트리 인증 정보 Secret
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: vote-tomcat
+#   namespace: vote
+# spec:
+#   selector:
+#     app: vote-tomcat
+#   ports:
+#     - protocol: TCP
+#       port: 8080
+#       targetPort: 8080
+#   type: ClusterIP  # 내부 서비스로만 접근 가능
+

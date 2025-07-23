@@ -40,4 +40,26 @@ public class RedisUtil {
             throw e;
         }
     }
+
+    // 문자열을 UTF-8로 인코딩하여 저장
+    public static void setString(String key, String value) {
+        try (Jedis jedis = getClient()) {
+            // UTF-8 인코딩하여 저장
+            jedis.set(key.getBytes(StandardCharsets.UTF_8), value.getBytes(StandardCharsets.UTF_8));
+            System.out.println(" [Redis] 값 저장 성공: " + value);
+        }
+    }
+
+    // Redis에서 UTF-8로 디코딩하여 값 조회
+    public static String getString(String key) {
+        try (Jedis jedis = getClient()) {
+            byte[] value = jedis.get(key.getBytes(StandardCharsets.UTF_8));
+            if (value != null) {
+                // UTF-8로 디코딩하여 반환
+                return new String(value, StandardCharsets.UTF_8);
+            } else {
+                return null;  // 값이 없을 경우
+            }
+        }
+    }
 }
