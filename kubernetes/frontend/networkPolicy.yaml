@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vote-nginx-allow-internal
+  namespace: vote
+spec:
+  podSelector:
+    matchLabels:
+      app: vote-nginx  # 이 Pod에만 적용
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    # kube-system 네임스페이스 전체 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  - from:
+    # vote-tomcat이 있는 vote 네임스페이스 내의 모든 pod (또는 특정 podSelector 가능)
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: vote
+    - podSelector:
+        matchLabels:
+          app: vote-tomcat

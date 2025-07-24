@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vote-tomcat
+  namespace: vote
+spec:
+  replicas: 1  # 필요한 복제본 수 설정
+  selector:
+    matchLabels:
+      app: vote-tomcat
+  template:
+    metadata:
+      labels:
+        app: vote-tomcat
+    spec:
+      containers:
+      - name: vote-tomcat
+        image: hansol-container-registry.kr.ncr.ntruss.com/tomcat-vote:1.0  # NCP 프라이빗 레지스트리에서 이미지를 가져옴
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: vote-tomcat-config  # ConfigMap 이름을 지정
+        - secretRef:
+            name: vote-tomcat-secret
+        livenessProbe:
+          httpGet:
+            path: /vote/health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3          
+        readinessProbe:
+          httpGet:
+            path: /vote/health
+            port: 8080
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+          periodSeconds: 3
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+      terminationGracePeriodSeconds: 20
+      imagePullSecrets:
+      - name: ncloud-registry-secret  # NCP 프라이빗 레지스트리 인증 정보 Secret
+
+

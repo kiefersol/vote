@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vote-tomcat-config
+  namespace: vote
+data:
+  DB_URL: "jdbc:mysql://mysql-service:3306/vote?useSSL=true"  # MySQL 서비스의 ExternalName 서비스 이름
+  DB_USER: "hansol"
+  REDIS_HOST: "redis-service"  # Redis 서비스 이름
+  REDIS_PORT: "6379"

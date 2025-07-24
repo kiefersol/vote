@@ -1,0 +1,53 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: vote-tomcat-policy
+  namespace: vote
+spec:
+  podSelector:
+    matchLabels:
+      app: vote-tomcat
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    # kube-system → 헬스체크, DNS 등 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+  - from:
+    # vote-nginx → frontend → tomcat 연결 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: vote
+    - podSelector:
+        matchLabels:
+          app: vote-nginx
+  egress:
+  - to:
+    # Redis → 내부 Pod
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: vote
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  - to:
+    # MySQL → 외부 도메인 (ExternalName 서비스 접근)
+    - ipBlock:
+        cidr: 0.0.0.0/0  # 또는 외부 DB의 IP 대역 제한
+    ports:
+    - protocol: TCP
+      port: 3306
+  - to:
+    # kube-system DNS (CoreDNS 등)
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
