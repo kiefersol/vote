@@ -3,6 +3,7 @@ package com.example.vote;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import java.nio.charset.StandardCharsets;
 
 public class RedisUtil {
     private static JedisPool pool;
