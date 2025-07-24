@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>투표 상세</title>
+  <script src="../js/detail.js"></script>
   <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
 </head>
@@ -11,7 +12,7 @@
   <div class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-md">
     <h1 id="voteTitle" class="text-2xl font-bold text-gray-800 mb-2">투표 제목</h1>
     <p id="voteDescription" class="text-gray-600 mb-6">투표 설명</p>
-
+    <p id="chartTypeLabel" class="text-gray-600 mb-6">모양 : 도넛</p>
     <canvas id="voteChart" class="max-w-md mx-auto my-8"></canvas>
     <div id="voteOptions" class="mt-6 text-center"></div>
   </div>
@@ -54,7 +55,5 @@
       }, duration);
     }
   </script>
-
-  <script src="../js/detail.js"></script>
 </body>
 </html>
