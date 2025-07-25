@@ -17,7 +17,7 @@ spec:
       memory: 256Mi
     # 사용자가 설정할 수 있는 최대 limit 값
     max:
-      cpu: 1000m
+      cpu: 2000m
       memory: 1Gi
     # 사용자가 설정할 수 있는 최소 request 값
     min:
