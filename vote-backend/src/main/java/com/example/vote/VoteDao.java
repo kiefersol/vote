@@ -40,6 +40,7 @@ public class VoteDao {
                 row.put("end_time", rs.getTimestamp("end_time").toString());
                 list.add(row);
             }
+            System.out.println("--------------GET-----------mysql 연결 성공 : 전체 리스트 가져오기");
         }
 
         return list;
@@ -51,7 +52,7 @@ public class VoteDao {
 
         try (Connection conn = DBUtil.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+            
             stmt.setInt(1, voteId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -62,11 +63,15 @@ public class VoteDao {
                     voteInfo.put("description", rs.getString("description"));
                     voteInfo.put("start_time", rs.getTimestamp("start_time").toString());
                     voteInfo.put("end_time", rs.getTimestamp("end_time").toString());
+                    System.out.println("--------------GET-----------mysql 연결 성공 : 투표 기본 정보 가져오기 - "+voteId);
                     return voteInfo;
+                    
                 } else {
                     return null;
                 }
             }
+
+            
         }
     }
 
@@ -88,6 +93,7 @@ public class VoteDao {
                     options.add(row);
                 }
             }
+            System.out.println("--------------GET-----------mysql 연결 성공 : 투표 옵션 정보 가져오기 - "+voteId);
         }
 
         return options;
@@ -161,20 +167,15 @@ public class VoteDao {
             }
         }
 
-        System.out.println("------------save----------------투표진행사항 파악");
-
         // 2. Redis에 집계
         String redisKey = "vote:" + voteId + ":results";
         try (Jedis jedis = RedisUtil.getClient()) {
             jedis.zincrby(redisKey, 1, String.valueOf(optionId));
-            System.out.println("-----------------save-----------redis 연결 성공");
+            System.out.println("-----------------save-----------redis 연결 성공:"+voteId+" 투표의 " +optionId+ " 저장");
         } catch (Exception e) {
             System.err.println("Redis 저장 실패: " + e.getMessage());
             return false;
         }
-
-
-        System.out.println("-----------------save-----------redis 연결 성공");
 
         // 3. MySQL 기록
         String sql = "INSERT INTO vote_record (vote_id, option_id) VALUES (?, ?)";
@@ -182,7 +183,7 @@ public class VoteDao {
             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, voteId);
             stmt.setInt(2, optionId);
-            System.out.println("-------------save---------------mysql 연결 성공");
+            System.out.println("-------------save---------------mysql 연결 성공:"+voteId+" 투표의 " +optionId+ " 저장");
             return stmt.executeUpdate() == 1;
             
         }
@@ -215,6 +216,7 @@ public class VoteDao {
                     results.add(row);
                 }
             }
+            System.out.println("--------------GET-----------mysql 연결 성공 : 투표 옵션 정보 가져오기 - "+voteId);
         }
         return results;
     }
@@ -309,7 +311,7 @@ public class VoteDao {
                 results.add(row);
             }
 
-            System.out.println("---------------redis 정보가져오기 성공: get");
+            System.out.println("---------------redis 정보가져오기 성공: get - " + voteId);
 
         } catch (Exception e) {
             System.err.println("Redis 조회 중 오류 발생: " + e.getMessage());
@@ -385,7 +387,7 @@ public class VoteDao {
             // 1. Redis 결과 불러오기
             Map<String, Integer> redisMap = new HashMap<>();
             List<Tuple> zset = jedis.zrangeWithScores(zsetKey, 0, -1);
-            
+            System.out.println("--------------GET-----------redis 연결 성공 : 최종 결과 정보 가져오기 - "+voteId);
             for (Tuple t : zset) {
                 // Redis에서 가져온 값은 바이트 배열일 수 있으므로, UTF-8로 디코딩
                 String optionId = new String(t.getElement().getBytes(), StandardCharsets.UTF_8);  // UTF-8로 디코딩
@@ -412,6 +414,8 @@ public class VoteDao {
                         dbMap.put(optionId, rs.getInt("cnt"));
                     }
                 }
+
+                System.out.println("--------------GET-----------mysql 연결 성공 : 최종 결과 정보 가져오기 - "+voteId);
 
             } catch (Exception e) {
                 System.err.println("vote_record 집계 실패: " + e.getMessage());
@@ -464,7 +468,7 @@ public class VoteDao {
                 }
 
                 stmt.executeBatch();
-                System.out.println("vote_result 저장 완료 (vote_id=" + voteId + ")");
+                System.out.println("-------------save---------------mysql 연결 성공:vote_result 저장 완료 (vote_id=" + voteId + ")");
 
             } catch (Exception e) {
                 System.err.println("vote_result 저장 오류: " + e.getMessage());
