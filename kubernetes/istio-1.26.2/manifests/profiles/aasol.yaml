@@ -1,0 +1,39 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  namespace: istio-system
+spec:
+  hub: docker.io/istio
+  tag: 1.26.2
+  components:
+    base:
+      enabled: true
+    pilot:
+      enabled: true
+    ingressGateways:
+    - name: istio-ingressgateway
+      enabled: true
+    egressGateways:
+    - name: istio-egressgateway
+      enabled: false
+  values:
+    global:
+      istioNamespace: istio-system
+    pilot:
+      resources:
+        requests:
+          cpu: 500m
+          memory: 512Mi
+        limits:
+          cpu: 700m
+          memory: 1Gi
+    gateways:
+      istio-ingressgateway:
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+

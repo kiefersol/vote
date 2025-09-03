@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3  # Istio의 최신 버전 사용
+kind: Gateway
+metadata:
+  name: vote-gateway
+  namespace: vote  # 네임스페이스 설정
+spec:
+  selector:
+    istio: ingressgateway  # Istio IngressGateway를 사용
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"

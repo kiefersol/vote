@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: vote-vs
+  namespace: vote
+spec:
+  hosts:
+    - "*"    
+  gateways:  # 게이트웨이로 사용할 인그레스 이름 지정
+    - vote-gateway
+  http:
+    - match:
+        - uri:
+            prefix: "/"
+      route:
+        - destination:
+            host: vote-nginx.vote.svc.cluster.local
+            port:
+              number: 80
